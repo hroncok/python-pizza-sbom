@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-		<title>Python Packaging: pyproject.toml build backends under the hood</title>
+		<title>Python Packaging and SBOMs</title>
 
 		<link rel="stylesheet" href="dist/reset.css">
 		<link rel="stylesheet" href="dist/reveal.css">
@@ -25,181 +25,116 @@
 ##  ![Fedora Loves Python](flp.svg)
 
 ---
-```pycon
-$ sudo dnf install python3.13
-$ python3.13 -m venv venv
-$ . venv/bin/activate
-(venv) $ python
-Python 3.13.0a4 (main, Feb 16 2024, 00:00:00) [GCC 13.2.1 20231205 (Red Hat 13.2.1-6)] on linux
-Type "help", "copyright", "credits" or "license" for more information.
->>> 
-```
-
----
-# pizza.py
-
-```python []
-"""
-This is a 🍕 module.
-"""
-```
----
-# pyproject.toml
-
-```toml [1-8|1-3|5-8]
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
-[project]
-name = "pizza"
-version = "2024"
-description = "🍕"
-```
-
----
-```pycon [1-4|5-6]
->>> import tomllib
->>> with open('pyproject.toml', 'rb') as f:
-...     pyproject = tomllib.load(f)
-... 
->>> pyproject['build-system']['requires']
-['hatchling']
->>> pyproject['build-system']['build-backend']
-'hatchling.build'
-```
-
----
 ```bash
-(venv) $ pip install hatchling
+$ cat .../site-packages/setuptools-65.5.1.dist-info/METADATA
+...
+Name: setuptools
+Version: 65.5.1
+...
+
+$ rpm -q python3.11-setuptools-wheel
+python3.11-setuptools-wheel-65.5.1-3.el9.noarch.rpm
 ```
 
 ---
-```pycon [7-8]
->>> import tomllib
->>> with open('pyproject.toml', 'rb') as f:
-...     pyproject = tomllib.load(f)
-... 
->>> pyproject['build-system']['requires']
-['hatchling']
->>> pyproject['build-system']['build-backend']
-'hatchling.build'
+
+# More metadata?
+
+```bash [4]
+Metadata-Version: 2.6
+Name: setuptools
+Version: 65.5.1
+Whatever-Miro-Needs: python3.11-setuptools-wheel-65.5.1-3.el9.noarch.rpm
+Whatever-Lumír-Secretly-Desires: 🍍 on 🍕
+...
 ```
 
 ---
-```pycon []
->>> requires = ['setuptools >= 40.8']
->>> backend_name = 'setuptools.build_meta:__legacy__'
-```
 
----
-```pycon [2-3]
->>> import importlib
->>> backend_name = pyproject['build-system']['build-backend']
->>> backend = importlib.import_module(backend_name)
->>> backend
-<module 'hatchling.build' from '.../site-packages/hatchling/build.py'>
-```
-
----
-```pycon [3-6|7-13]
->>> import importlib, sys
->>> backend_name = pyproject['build-system']['build-backend']
->>> backend_path = pyproject['build-system'].get('backend-path')
->>> if backend_path:
-...     sys.path = backend_path + sys.path
-... 
->>> module_name, _, object_name = backend_name.partition(':')
->>> backend_module = importlib.import_module(module_name)
->>> if object_name:
-...     backend = getattr(backend_module, object_name)
-... else:
-...     backend = backend_module
-... 
->>> backend
-<module 'hatchling.build' from '.../site-packages/hatchling/build.py'>
-```
-
----
-```pycon [1-4|5-6]
->>> hasattr(backend, 'get_requires_for_build_wheel')
-True
->>> backend.get_requires_for_build_wheel()
-[]
->>> backend.build_wheel('.')
-'pizza-2024-py2.py3-none-any.whl'
-```
-
----
-```pycon [1-4|5-6]
->>> hasattr(backend, 'get_requires_for_build_sdist')
-True
->>> backend.get_requires_for_build_sdist()
-[]
->>> backend.build_sdist('.')
-'pizza-2024.tar.gz'
-```
-
----
-```pycon [1-4|5-6]
->>> hasattr(backend, 'get_requires_for_build_editable')
-True
->>> backend.get_requires_for_build_editable()
-[]
->>> backend.build_editable('.')
-'pizza-2024-py2.py3-none-any.whl'
-```
-
----
- * **PEP 517**: A build-system independent format for source trees
- * **PEP 518**: Specifying Minimum Build System Requirements for Python Projects
- * **PEP 660**: Editable installs for pyproject.toml based builds (wheel based)
-
----
 <!-- https://unsplash.com/photos/yellow-cheese-lot-on-brown-wooden-shelf-v9deD75EaRw -->
 <section data-background="cheese.jpg" />
 
 ---
-# pyproject.toml
 
-```toml [5-8]
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+##  ![auditwheel](auditwheel.svg)
 
-[project]
-name = "pizza"
-version = "2024"
-description = "🍕"
+---
+
+```bash [4]
+Metadata-Version: 2.7
+Name: setuptools
+Version: 65.5.1
+Is-In-This: libXau-1.0.9-3.el8.x86_64.rpm
+...
 ```
 
 ---
-# pizza-2024.dist-info/METADATA
 
-```email []
-Metadata-Version: 2.1
-Name: pizza
-Version: 2024
-Summary: 🍕
+# SBOM
+
+Software Bill-of-Materials
+
+---
+
+```json
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "metadata": {
+    "component": {
+      "name": "MyApplication",
+      "version": "1.0.0",
+      "type": "application"
+    }
+  },
+  "components": [
+    {
+      "name": "lodash",
+      "version": "4.17.21",
+      "licenses": [{"license": {"id": "MIT"}}],
+      "type": "library"
+    },
+    {
+      "name": "express",
+      "version": "4.18.2",
+      "licenses": [{"license": {"id": "MIT"}}],
+      "type": "library"
+    }
+  ]
+}
 ```
 
 ---
-# pizza.py
 
-```python []
-"""
-This is a 🍕 module.
-"""
+# PEP 770
+
+Improving measurability of Python packages with Software Bill-of-Materials
+
+---
+
+# PEP 770
+
+- common location
+- any SBOM format
+- whatever you need in it
+
+---
+
+```bash
+$ cat .../site-packages/setuptools-65.5.1.dist-info/sboms/bom.json
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "components": [
+    {
+      "type": "library",
+      "name": "python3.11-setuptools",
+      "version": "65.5.1-3.el9",
+      "purl": "pkg:rpm/redhat/python3.11-setuptools@65.5.1-3.el9?arch=src"
+    }
+  ]
+}
 ```
-
----
-![distutils](distutils-meme.png)
-
----
- * **PEP 566**+: Metadata for Python Software Packages
- * **PEP 621**: Storing project metadata in pyproject.toml
- * github.com/**ofek/extensionlib**
-
 ---
 
 <!-- https://icons.getbootstrap.com/icons/mastodon/ -->

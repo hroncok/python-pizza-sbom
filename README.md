@@ -1,6 +1,6 @@
-## Prague Python Pizza 2024
+## Ostrava Python Pizza 2026
 
-### Python Packaging: pyproject.toml build backends under the hood
+### Software Bill-of-Materials in Python Wheels
 
 ...
 
