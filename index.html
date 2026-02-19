@@ -35,6 +35,17 @@ Version: 65.5.1
 $ rpm -q python3.11-setuptools-wheel
 python3.11-setuptools-wheel-65.5.1-3.el9.noarch.rpm
 ```
+---
+```bash
+$ cat .../site-packages/setuptools-65.5.1.dist-info/METADATA
+...
+Name: setuptools
+Version: 65.5.1-3
+...
+
+$ rpm -q python3.11-setuptools-wheel
+python3.11-setuptools-wheel-65.5.1-3.el9.noarch.rpm
+```
 
 ---
 
@@ -62,8 +73,8 @@ Whatever-Lumír-Secretly-Desires: 🍍 on 🍕
 
 ```bash [4]
 Metadata-Version: 2.7
-Name: setuptools
-Version: 65.5.1
+Name: pillow
+Version: 12.1.1
 Is-In-This: libXau-1.0.9-3.el8.x86_64.rpm
 ...
 ```
@@ -114,7 +125,7 @@ Improving measurability of Python packages with Software Bill-of-Materials
 
 # PEP 770
 
-- common location
+- common location in `*.dist-info/sboms`
 - any SBOM format
 - whatever you need in it
 
@@ -132,6 +143,73 @@ $ cat .../site-packages/setuptools-65.5.1.dist-info/sboms/bom.json
       "version": "65.5.1-3.el9",
       "purl": "pkg:rpm/redhat/python3.11-setuptools@65.5.1-3.el9?arch=src"
     }
+  ]
+}
+```
+
+---
+
+```bash
+$ cat .../site-packages/pillow-12.1.1.dist-info/sboms/auditwheel.cdx.json | python -m json
+{
+    "bomFormat": "CycloneDX",
+    "specVersion": "1.4",
+    "version": 1,
+    "metadata": {
+        "component": {
+            "type": "library",
+            "bom-ref": "pkg:pypi/pillow@12.1.1?file_name=pillow-12.1.1-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+            "name": "pillow",
+            "version": "12.1.1",
+            "purl": "pkg:pypi/pillow@12.1.1?file_name=pillow-12.1.1-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
+        },
+        "tools": [
+            {
+                "name": "auditwheel",
+                "version": "6.5.0"
+            }
+        ]
+    },
+    "components": [
+        {
+            "type": "library",
+            "bom-ref": "pkg:pypi/pillow@12.1.1?file_name=pillow-12.1.1-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+            "name": "pillow",
+            "version": "12.1.1",
+            "purl": "pkg:pypi/pillow@12.1.1?file_name=pillow-12.1.1-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:rpm/almalinux/libXau@1.0.9-3.el8#ac77887fa9a50833ff7a34d7e27ebe243468552bc94f6628693cb1dfdaf102e7",
+            "name": "libXau",
+            "version": "1.0.9-3.el8",
+            "purl": "pkg:rpm/almalinux/libXau@1.0.9-3.el8"
+        }
+    ],
+    "dependencies": [
+        {
+            "ref": "pkg:pypi/pillow@12.1.1?file_name=pillow-12.1.1-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+            "dependsOn": [
+                "pkg:rpm/almalinux/libXau@1.0.9-3.el8#ac77887fa9a50833ff7a34d7e27ebe243468552bc94f6628693cb1dfdaf102e7"
+            ]
+        },
+        {
+            "ref": "pkg:rpm/almalinux/libXau@1.0.9-3.el8#ac77887fa9a50833ff7a34d7e27ebe243468552bc94f6628693cb1dfdaf102e7"
+        }
+    ]
+}
+
+```
+
+---
+
+```bash
+$ cat .../site-packages/lumir-1.2.3.dist-info/sboms/pizza.json
+{
+  "shape": "round",
+  "components": [
+    "pineapple",
+    ...,
   ]
 }
 ```
