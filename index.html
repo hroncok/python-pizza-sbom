@@ -87,26 +87,47 @@ Software Bill-of-Materials
 
 ---
 
+<!-- https://unsplash.com/photos/round-cooked-pizza-x00CzBt4Dfk -->
+<section data-background="pizza.jpg" />
+
+---
+
+<!-- https://unsplash.com/photos/person-holding-white-textile-on-stainless-steel-tray-sGwGN4PEQac -->
+<section data-background="dough.jpg" />
+
+---
+
+<!-- https://unsplash.com/photos/red-cherry-tomatoes-nM6qrtnVKn8 -->
+<section data-background="tomatoes.jpg" />
+
+---
+
+<!-- https://unsplash.com/photos/orange-and-green-pineapple-fruits-ZS_RypKo9sk -->
+<section data-background="pineapple.jpg" />
+
+---
+<section style="font-size: 90%;">
+    
 ```json
 {
   "bomFormat": "CycloneDX",
   "specVersion": "1.5",
   "metadata": {
     "component": {
-      "name": "MyApplication",
+      "name": "pizza",
       "version": "1.0.0",
       "type": "application"
     }
   },
   "components": [
     {
-      "name": "lodash",
+      "name": "tomatoes",
       "version": "4.17.21",
       "licenses": [{"license": {"id": "MIT"}}],
       "type": "library"
     },
     {
-      "name": "express",
+      "name": "pineapple",
       "version": "4.18.2",
       "licenses": [{"license": {"id": "MIT"}}],
       "type": "library"
@@ -130,8 +151,9 @@ Improving measurability of Python packages with Software Bill-of-Materials
 - whatever you need in it
 
 ---
+<section style="font-size: 97%;">
 
-```bash
+```bash [1,6-11|10]
 $ cat .../site-packages/setuptools-65.5.1.dist-info/sboms/bom.json
 {
   "bomFormat": "CycloneDX",
@@ -147,9 +169,11 @@ $ cat .../site-packages/setuptools-65.5.1.dist-info/sboms/bom.json
 }
 ```
 
----
 
-```bash
+---
+<section style="font-size: 70%;">
+
+```bash [1|7-8,10-13|14-19|29-30,32-35]
 $ cat .../site-packages/pillow-12.1.1.dist-info/sboms/auditwheel.cdx.json | python -m json
 {
     "bomFormat": "CycloneDX",
@@ -204,14 +228,11 @@ $ cat .../site-packages/pillow-12.1.1.dist-info/sboms/auditwheel.cdx.json | pyth
 ---
 
 ```bash
-$ cat .../site-packages/lumir-1.2.3.dist-info/sboms/pizza.json
-{
-  "shape": "round",
-  "components": [
-    "pineapple",
-    ...,
-  ]
-}
+$ cat .../site-packages/lumir-1.2.3.dist-info/sboms/pizza.yaml
+shape: round
+components:
+- pineapple
+- ...
 ```
 ---
 
